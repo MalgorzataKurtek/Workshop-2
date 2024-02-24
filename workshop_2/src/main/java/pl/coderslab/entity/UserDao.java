@@ -6,9 +6,9 @@ import java.sql.*;
 
 public class UserDao {
 
-    
     public static final String CREATE_USER = "INSERT INTO users(email, username, password) values (?, ?, ?);";
     private static final String READ_USER_QUERY = "SELECT * FROM users where id = ?";
+    private static final String UPDATE_USER_QUERY = "UPDATE users SET username = ?, email = ?, password = ? where id = ?";
 
     // Tworzenie nowego użytkownika:
     public User createUser(User user) {
@@ -53,5 +53,19 @@ public class UserDao {
             e.printStackTrace();
         }
         return null;
+    }
+
+    // modyfikacja obiektu:
+    public void update(User user) {
+        try (Connection conn = DbUtil.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(UPDATE_USER_QUERY);
+            statement.setString(1, user.getUserName());
+            statement.setString(2, user.getEmail());
+            statement.setString(3, this.hashPassword(user.getPassword()));
+            statement.setInt(4, user.getId());
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
