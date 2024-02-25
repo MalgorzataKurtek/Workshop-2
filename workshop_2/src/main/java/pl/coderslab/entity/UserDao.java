@@ -6,9 +6,10 @@ import java.sql.*;
 
 public class UserDao {
 
-    public static final String CREATE_USER = "INSERT INTO users(email, username, password) values (?, ?, ?);";
-    private static final String READ_USER_QUERY = "SELECT * FROM users where id = ?";
-    private static final String UPDATE_USER_QUERY = "UPDATE users SET username = ?, email = ?, password = ? where id = ?";
+    public static final String CREATE_USER = "INSERT INTO users(email, username, password) VALUES (?, ?, ?);";
+    private static final String READ_USER_QUERY = "SELECT * FROM users WHERE id = ?";
+    private static final String UPDATE_USER_QUERY = "UPDATE users SET username = ?, email = ?, password = ? WHERE id = ?";
+    private static final String DELETE_USER_QUERY = "DELETE FROM users WHERE id = ?";
 
     // Tworzenie nowego użytkownika:
     public User createUser(User user) {
@@ -63,6 +64,18 @@ public class UserDao {
             statement.setString(2, user.getEmail());
             statement.setString(3, this.hashPassword(user.getPassword()));
             statement.setInt(4, user.getId());
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    // usunięcie obiektu:
+    public void deleteUser(int userId) {
+        try (Connection conn = DbUtil.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(DELETE_USER_QUERY);
+            statement.setInt(1, userId);
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
