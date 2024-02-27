@@ -1,7 +1,7 @@
 package pl.coderslab.entity;
 
 import org.mindrot.jbcrypt.BCrypt;
-
+import java.util.Arrays;
 import java.sql.*;
 
 public class UserDao {
@@ -10,6 +10,7 @@ public class UserDao {
     private static final String READ_USER_QUERY = "SELECT * FROM users WHERE id = ?";
     private static final String UPDATE_USER_QUERY = "UPDATE users SET username = ?, email = ?, password = ? WHERE id = ?";
     private static final String DELETE_USER_QUERY = "DELETE FROM users WHERE id = ?";
+    private static final String FIND_ALL_USERS_QUERY = "SELECT * FROM users";
 
     // Tworzenie nowego użytkownika:
     public User createUser(User user) {
@@ -70,7 +71,6 @@ public class UserDao {
         }
     }
 
-
     // usunięcie obiektu:
     public void deleteUser(int userId) {
         try (Connection conn = DbUtil.getConnection()) {
@@ -79,6 +79,28 @@ public class UserDao {
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+    // wyświetlenie wszystkich użytkowników:
+    public User[] findAll() {
+        try (Connection conn = DbUtil.getConnection()) {
+            User[] users = new User[0];
+            PreparedStatement statement = conn.prepareStatement(FIND_ALL_USERS_QUERY);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                User user = new User();
+                user.setId(resultSet.getInt("id"));
+                user.setUserName(resultSet.getString("username"));
+                user.setEmail(resultSet.getString("email"));
+                user.setPassword(resultSet.getString("password"));
+                users = Arrays.copyOf(users, users.length + 1);
+                users[users.length - 1] = user;
+            }
+            return users;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }

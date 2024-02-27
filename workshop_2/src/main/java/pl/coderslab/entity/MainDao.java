@@ -18,5 +18,10 @@ public class MainDao {
         userToUpdate.setPassword("superPassword");
         userDao.update(userToUpdate);
         userDao.deleteUser(3);
+
+        User[] all = userDao.findAll();
+        for (User u : all) {
+            System.out.println(u);
+        }
     }
 }
